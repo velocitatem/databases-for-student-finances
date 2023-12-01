@@ -20,25 +20,28 @@ two_word_spans = [ span for span in spans if len(span.text.split()) == 2 ]
 nltk.download('averaged_perceptron_tagger')
 nltk.download('maxent_ne_chunker')
 nltk.download('words')
+nltk.download('punkt')
 
 
 def scrape_website_content(url):
     """
     Function to scrape website content. Returns a list of 2 word string.
     """
-    pass
+    return BeautifulSoup(requests.get(url).content, 'html.parser')
 
-def get_names(string):
+def get_names(spans):
     """
     Function to get names from a string. Returns a list of names.
     """
-    pass
+    return[ span.text.strip() for span in spans if is_name(span.text) ]
 
-def get_links_from_url(url):
-    """
-    Function to get all links from a url. Returns a list of links.
-    """
-    pass
+def get_links_from_url(page_contents):
+    if page_contents is None:
+        return []
+    # clearn the links if they are not none
+    lnks = page_contents.find_all('a')
+    lnks = [link for link in lnks if link.get('href') is not None]
+    return [link.get('href') for link in lnks  if 'ie.edu' in link.get('href')]
 
 def is_name(string):
     # Tokenize and POS tag the text
@@ -54,16 +57,33 @@ def is_name(string):
     # Check if any named entity is labeled as PERSON
     return any(chunk.label() == 'PERSON' for chunk in tree if hasattr(chunk, 'label'))
 
-string = "Your string here"
-print(is_name(string))
-
 
 # get all names
-names = [ span.text for span in two_word_spans if is_name(span.text) ]
+names = set([ span.text for span in two_word_spans if is_name(span.text) ])
 
-# TODO Here define a crawler
-# goes through all the links and get all the names
-
+links = get_links_from_url(body)
+# get all names
+limit = 100
+while len(links) > 0 and limit > 0:
+    limit -= 1
+    try:
+        link = links.pop(0)
+        print(link, names)
+        page = scrape_website_content(link)
+        if page is None:
+            continue
+        # two word spans
+        spans = [ span for span in page.find_all('span') if len(span.text.split()) == 2 ]
+        new_names = get_names(spans)
+        # add all new names
+        [ names.add(name) for name in new_names]
+        links_on_link = get_links_from_url(page)
+        links.extend(links_on_link)
+    except:
+        pass
 
 # get all emails
-print(names)
+# re check all names if they are not ALL CAPS or \n or \r
+clean_names = [ name for name in names if not re.match(r'^[A-Z\s]+$', name) and not re.match(r'^\n$', name) and not re.match(r'^\r$', name) ]
+
+print(clean_names)
