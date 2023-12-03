@@ -37,12 +37,13 @@ def return_random_subscription_type(num_names) -> list:
                           'subscription_type_name': fake.word(), 'subscription_type_amount': fake.random_int(10, 100)})
     return json_data
 
-def return_random_expense(num_names) -> list:
+def return_random_expense(num_names, user) -> list:
     fake = Faker()
     json_data = []
     for i in range(num_names):
-        json_data.append({'expense_id': uuid.uuid4().hex[:50]  \
-                         , 'transaction_id': fake.random_int(100, 10000)})
+        json_data.append({'expense_id': uuid.uuid4().hex[:50] \
+                         ,'expense_type_id': uuid.uuid4().hex[:50] \
+                         , 'user_id': user, 'transaction_id': uuid.uuid4().hex[:50]})
     return json_data
 
 def return_random_expense_type(num_names) -> list:
@@ -53,16 +54,10 @@ def return_random_expense_type(num_names) -> list:
                          , 'expense_type_name': fake.word()})
     return json_data
 
-def return_random_transaction(num_names) -> list:
-    fake = Faker()
-    json_data = []
-    for i in range(num_names):
-        json_data.append({'transaction_id': i+1, 'transaction_amount': fake.random_int(100, 10000)})
-    return json_data
 
 
 
-def fake_single_transaction_data():
+def fake_single_transaction_data(transaction_id):
     fake = Faker()
     ts = {}
 
@@ -72,7 +67,7 @@ def fake_single_transaction_data():
 
 
     return {
-        "transaction_id" : uuid.uuid4().hex[:50],
+        "transaction_id" : transaction_id,
         "transaction_amount" : random.randint(0,1000),
         "transaction_date" : fake.date_between('-8y'),
         "financial_invoice" : ts,
@@ -122,13 +117,12 @@ def main():
     # SubscriptionType, Budget, ExpenseType
     pres = [
         return_random_subscription_type(num_names),
-        return_random_expense_type(num_names)
     ]
     pres_copy = pres.copy()
     budgets = return_random_budget(num_names)
 
     # populate the database
-    for table in ['subscription_type', 'expense_type']:
+    for table in ['subscription_type']:
         tableData = pres.pop(0)
         for row in tableData:
             insert(table, row)
@@ -137,7 +131,7 @@ def main():
 
 
     import uuid
-    for user in df['name']:
+    for user in df['name'][0:num_names]:
         # user id char field max 50
         user_id = uuid.uuid4().hex[:50]
         user = {
@@ -165,12 +159,25 @@ def main():
         insert('budget', budget)
         print(budget)
 
-
-
-
         # Expense, Transaction generation
         # this is unstructure @kye :here:
         # generate random expenses under user id
+
+        # generate random transactions under user id
+        expenses = return_random_expense(random.randint(5,10) , user_id)
+        # make sure all are unique transaction ids
+        for expense in expenses:
+            # generate a transaction for this
+            transaction = fake_single_transaction_data(expense['transaction_id'])
+            insert('expense', expense)
+            insert('transaction', transaction)
+            print(expense)
+            print(transaction)
+
+
+
+        # generate random expenses under user id for each
+
 
 
 

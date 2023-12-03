@@ -30,10 +30,11 @@ class Subscription(models.Model):
     subscription_end_date = models.DateField()
 
 class ExpenseType(models.Model):
-    expense_type_id = models.CharField(max_length=50, primary_key=True)
+    expense_type_id = models.CharField(max_length=50, primary_key=True, unique=True, default=uuid.uuid4().hex[:50])
     expense_type_name = models.CharField(max_length=50)
 
 class Expense(models.Model):
+    expense_id = models.CharField(max_length=100, primary_key=True, unique=True, default=uuid.uuid4())
     expense_type_id = models.CharField(max_length=50)
     user_id = models.CharField(max_length=50)
     transaction_id = models.CharField(max_length=50)
@@ -47,3 +48,4 @@ class Transaction(models.Model):
     financial_invoice = models.JSONField()
     class Meta:
         app_label = 'money'
+        db_table = 'transaction'

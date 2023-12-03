@@ -40,3 +40,39 @@ def get_average_budget(request):
 
 
     return render(request, 'money/average_budget.html', {'average_budgets': average_budgets, 'min_age': min_age['min_age'], 'max_age': max_age['max_age']})
+
+
+
+def get_user_transactions(request, user_id):
+    # Get transactions for the specified user
+    allTransactions = Transaction.objects.all()
+    expenses = Expense.objects.all()
+    print(allTransactions)
+    print(expenses)
+    # manual join
+    joined = []
+    for expense in expenses:
+        for transaction in allTransactions:
+            if expense.transaction_id == transaction.transaction_id and \
+                    expense.user_id == user_id:
+                merged = {**expense.__dict__, **transaction.__dict__}
+                joined.append(merged)
+
+    # join expense type
+
+
+    # Prepare data for the template context
+    data = []
+    for transaction in joined:
+        print(transaction)
+        data.append({
+            'transaction_id': transaction['transaction_id']
+            , 'transaction_amount': transaction['transaction_amount']
+            , 'transaction_date': transaction['transaction_date']
+            , 'financial_invoice': transaction['financial_invoice']
+            , 'expense_id': transaction['expense_id']
+
+        })
+
+    # Render the template with the context data
+    return render(request, 'money/user_transactions.html', {'transactions': data})
