@@ -9,6 +9,7 @@ class User(models.Model):
     email = models.EmailField()  # Example for Email
     phone_number = models.CharField(max_length=20)  # Example for PhoneNumber
     age = models.IntegerField()  # Example for Age
+    budget_id = models.CharField(max_length=50)
 
 class Budget(models.Model):
     budget_id = models.CharField(max_length=50, primary_key=True)

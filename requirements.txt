@@ -3,3 +3,5 @@ nltk
 pandas
 beautifulsoup4
 django
+transformers
+faker
