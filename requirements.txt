@@ -1,5 +1,7 @@
 requests
-nltk
 pandas
 beautifulsoup4
 django
+tensorflow
+faker
+pymongo
