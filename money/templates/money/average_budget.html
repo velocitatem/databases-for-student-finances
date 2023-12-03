@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Average Budgets</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 text-gray-900">
+    <div class="container mx-auto p-4">
+        <h1 class="text-2xl font-bold mb-4">Average Budgets by Age Category</h1>
+        <p>We expect uniform distrubution if data is random</p>
+        <span>Min Age Category: {{ min_age }}</span><br>
+        <span>Max Age Category: {{ max_age }}</span><br>
+        <table class="table-auto w-full mt-4">
+            <thead>
+                <tr>
+                    <th class="px-4 py-2">Age Category</th>
+                    <th class="px-4 py-2">Average Budget</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for age_category, average_budget in average_budgets.items %}
+                <tr class="bg-white border-4 border-gray-200">
+                    <td class="px-4 py-2">{{ age_category }}</td>
+                    <td class="px-4 py-2">{{ average_budget }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

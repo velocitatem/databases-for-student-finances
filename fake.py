@@ -28,21 +28,6 @@ def fake_user_transaction_data(id):
     
 
 
-def fake_single_transaction_data(id):
-    fake = faker.Faker()
-    t = [fake.company(), f"${random.randint(0,80)}.{random.randint(0,100)}", str(fake.date_between('-8y'))]
-    if random.randint(0,100) <= 30:
-        t.append(fake.ean())
-
-    random.shuffle(t)
-    ts = f"{t[0]}, {t[1]}, {t[2]}"
-    if len(t) > 3:
-        ts += f", {t[3]}"
-
-    return {
-        "user_id" : id,
-        "transaction" : ts
-    }
 
 
 fake_user_data(["bippis mippis", "ippis lippis", "joe rogan", "bim job"])

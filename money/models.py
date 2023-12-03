@@ -35,4 +35,15 @@ class ExpenseType(models.Model):
 
 class Expense(models.Model):
     expense_type_id = models.CharField(max_length=50)
+    user_id = models.CharField(max_length=50)
     transaction_id = models.CharField(max_length=50)
+
+# make use of mongodb for transactions
+class Transaction(models.Model):
+    transaction_id = models.CharField(max_length=50, primary_key=True)
+    transaction_amount = models.FloatField()
+    transaction_date = models.DateField()
+    # allow for multiple financial invoice values as unstructured fields
+    financial_invoice = models.JSONField()
+    class Meta:
+        app_label = 'money'

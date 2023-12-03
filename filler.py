@@ -62,6 +62,22 @@ def return_random_transaction(num_names) -> list:
 
 
 
+def fake_single_transaction_data():
+    fake = Faker()
+    ts = {}
+
+    # generate random invoice
+    for i in range(random.randint(1,5)):
+        ts[fake.word()] = fake.random_int(100, 10000)
+
+
+    return {
+        "transaction_id" : uuid.uuid4().hex[:50],
+        "transaction_amount" : random.randint(0,1000),
+        "transaction_date" : fake.date_between('-8y'),
+        "financial_invoice" : ts,
+    }
+
 from django.apps import apps
 
 
@@ -73,7 +89,7 @@ def insert(table, data):
         'expense': "Expense",
         'transaction': "Transaction",
         'subscription': "Subscription",
-        'user': "User"
+        'user': "User",
     }
     table = dataMap[table]
     # Get the model from the table name
@@ -86,18 +102,18 @@ def insert(table, data):
     instance.save()
 
 def clear():
-    from money.models import User, Budget, SubscriptionType, Subscription, ExpenseType, Expense
+    from money.models import User, Budget, SubscriptionType, Subscription, ExpenseType, Expense, Transaction
     User.objects.all().delete()
     Budget.objects.all().delete()
     SubscriptionType.objects.all().delete()
     Subscription.objects.all().delete()
     ExpenseType.objects.all().delete()
     Expense.objects.all().delete()
+    Transaction.objects.all().delete()
     print("Cleared all tables")
 
 def main():
     clear()
-    return None
     file = "names.csv"
     import pandas as pd
     df = pd.read_csv(file)
@@ -149,9 +165,13 @@ def main():
         insert('budget', budget)
         print(budget)
 
+
+
+
         # Expense, Transaction generation
         # this is unstructure @kye :here:
         # generate random expenses under user id
+
 
 
 
