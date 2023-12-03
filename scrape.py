@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 import re
 import pandas as pd
 
-url = 'https://www.ie.edu/'
+url = 'https://www.ie.edu/school-science-technology/news/ie-universitys-robotics-and-ai-lab-officially-opens/'
 r = requests.get(url)
 soup = BeautifulSoup(r.text, 'html.parser')
 
@@ -62,9 +62,7 @@ names = set([ span.text for span in two_word_spans if is_name(span.text) ])
 links = get_links_from_url(body)
 seen = set(links)
 # get all names
-limit = 1000
-while len(links) > 0 and limit > 0:
-    limit -= 1
+while len(links) > 0:
     try:
         link = links.pop(0)
         page = scrape_website_content(link)
