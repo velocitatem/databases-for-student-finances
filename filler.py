@@ -1,14 +1,16 @@
 import os
 import django
+from faker import Faker
+import pandas as pd
+from datetime import datetime, timedelta
+from django.apps import apps
+import random
+import json
+import uuid
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'student_finances.settings')
 django.setup()
 
-from faker import Faker
-from datetime import datetime, timedelta
-import random
-import json
-import uuid
 
 def return_random_budget(num_names) -> list:
     fake = Faker()
@@ -73,7 +75,6 @@ def fake_single_transaction_data(transaction_id):
         "financial_invoice" : ts,
     }
 
-from django.apps import apps
 
 
 def insert(table, data):
@@ -98,6 +99,7 @@ def insert(table, data):
 
 def clear():
     from money.models import User, Budget, SubscriptionType, Subscription, ExpenseType, Expense, Transaction
+    # gotta clear the tables first before a load
     User.objects.all().delete()
     Budget.objects.all().delete()
     SubscriptionType.objects.all().delete()
@@ -110,7 +112,6 @@ def clear():
 def main():
     clear()
     file = "names.csv"
-    import pandas as pd
     df = pd.read_csv(file)
     num_names = len(df)
 
@@ -118,10 +119,12 @@ def main():
     pres = [
         return_random_subscription_type(num_names),
     ]
+    # since we deplate in some of the method we copy here
     pres_copy = pres.copy()
     budgets = return_random_budget(num_names)
 
     # populate the database
+    # should have been for multiple types, but now I removed a lot
     for table in ['subscription_type']:
         tableData = pres.pop(0)
         for row in tableData:
@@ -130,11 +133,11 @@ def main():
 
 
 
-    import uuid
     for user in df['name'][0:num_names]:
         # user id char field max 50
         user_id = uuid.uuid4().hex[:50]
         user = {
+            # create a new user object
             'user_id': user_id,
             'name': user.split()[0],
             'surname': " ".join(user.split()[1:]),
@@ -146,46 +149,53 @@ def main():
         budget = budgets.pop(0)
         budget['user_id'] = user_id
         user['budget_id'] = budget['budget_id']
+        # budget lining
         sub_type = pres[0].pop(0)
         subscription = return_random_subscription(num_names, sub_type, user_id)
         user['subscription_id'] = subscription['subscription_id']
         # save the user
-        insert('user', user)
+        try:
+            insert('user', user)
+        except Exception as e:
+            print(f"Failed to insert user {user['user_id']}")
         print(user)
         # save the subscription
-        insert('subscription', subscription)
+        try:
+            insert('subscription', subscription)
+        except Exception as e:
+            print(f"Failed to insert subscription {subscription['subscription_id']}")
         print(subscription)
         # save the budget
-        insert('budget', budget)
+        try:
+            insert('budget', budget)
+        except Exception as e:
+            print(f"Failed to insert budget {budget['budget_id']}")
         print(budget)
 
         # Expense, Transaction generation
         # this is unstructure @kye :here:
         # generate random expenses under user id
 
+        p = random.randint(5,10)
         # generate random transactions under user id
-        expenses = return_random_expense(random.randint(5,10) , user_id)
+        expenses = return_random_expense(p , user_id)
+        expense_types = return_random_expense_type(p)
         # make sure all are unique transaction ids
         for expense in expenses:
             # generate a transaction for this
             transaction = fake_single_transaction_data(expense['transaction_id'])
-            insert('expense', expense)
-            insert('transaction', transaction)
+            expense_type = expense_types.pop(0)
+            expense['expense_type_id'] = expense_type['expense_type_id']
+            # save the expense type
+            try:
+                insert('expense_type', expense_type)
+                insert('expense', expense)
+                insert('transaction', transaction)
+            except Exception as e:
+                print(f"Failed to insert expense {expense['expense_id']}, cannot insert transaction {transaction['transaction_id']} and expense type {expense_type['expense_type_id']}")
+
             print(expense)
             print(transaction)
-
-
-
-        # generate random expenses under user id for each
-
-
-
-
-
-
-
-
-
 
 
 main()

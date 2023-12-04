@@ -1,3 +1,6 @@
+"""
+modified router to allow for easier mongo filtration
+"""
 class MongoRouter:
     """
     A router to control all database operations on models in the
