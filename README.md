@@ -4,6 +4,11 @@
 
 This project combines web scraping using the Hugging Face AI model for named entity recognition and data generation with the Faker library to create financial data for university users. The generated data is then stored in a MongoDB database through a Django application.
 
+After the Database is created with the scraped names and fake fill data we can start using it. We setup 2 views of the data:
+
+1. One that list all the transactions for the user.
+2. The other one that get the average budget for a certain age range.
+
 ## Prerequisites
 
 Before running the application, make sure you have the following installed:
