@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import re
 import pandas as pd
 
+# get the website content
 url = 'https://www.ie.edu/school-science-technology/news/ie-universitys-robotics-and-ai-lab-officially-opens/'
 r = requests.get(url)
 soup = BeautifulSoup(r.text, 'html.parser')
@@ -42,8 +43,11 @@ def get_links_from_url(page_contents):
 # mdarhri00/named-entity-recognition
 from transformers import pipeline
 
+# load a nice helpful model from huggingface
 pipe = pipeline("token-classification", model="mdarhri00/named-entity-recognition")
 
+# caching ofisname for like stuff we see
+# this could be COOKIES or something
 from functools import cache
 
 @cache
