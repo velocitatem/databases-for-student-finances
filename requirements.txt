@@ -2,7 +2,9 @@ requests
 pandas
 beautifulsoup4
 django
+djongo
 tensorflow
 faker
 pymongo
 transformers
+pymongo==3.11.0

@@ -163,12 +163,18 @@ def main():
         # this is unstructure @kye :here:
         # generate random expenses under user id
 
+        p = random.randint(5,10)
         # generate random transactions under user id
-        expenses = return_random_expense(random.randint(5,10) , user_id)
+        expenses = return_random_expense(p , user_id)
+        expense_types = return_random_expense_type(p)
         # make sure all are unique transaction ids
         for expense in expenses:
             # generate a transaction for this
             transaction = fake_single_transaction_data(expense['transaction_id'])
+            expense_type = expense_types.pop(0)
+            expense['expense_type_id'] = expense_type['expense_type_id']
+            # save the expense type
+            insert('expense_type', expense_type)
             insert('expense', expense)
             insert('transaction', transaction)
             print(expense)
